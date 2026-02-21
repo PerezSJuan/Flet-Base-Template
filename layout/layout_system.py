@@ -77,7 +77,6 @@ class ResponsiveLayout(ft.Container):
             if animate_transitions
             else None
         )
-        fade_anim = anim if fade_sidebars else None
 
         # --- Contenedores de barras ---
 
@@ -101,24 +100,39 @@ class ResponsiveLayout(ft.Container):
         self._left_open = self.left_bar_control is not None
         self._right_open = self.right_bar_control is not None
 
-        self.left_container = ft.Container(
+        # Contenedores internos para animación de deslizamiento (slide) y fade
+        self.left_inner = ft.Container(
             content=self.left_bar_control,
-            width=left_bar_width if self.left_bar_control is not None else 0,
+            animate_offset=anim,
+            animate_opacity=anim,
+            offset=ft.Offset(0, 0) if self._left_open else ft.Offset(-0.1, 0),
+            opacity=1.0 if self._left_open else 0.0,
+            width=left_bar_width,  # Mantener el ancho real dentro
+        )
+
+        self.right_inner = ft.Container(
+            content=self.right_bar_control,
+            animate_offset=anim,
+            animate_opacity=anim,
+            offset=ft.Offset(0, 0) if self._right_open else ft.Offset(0.1, 0),
+            opacity=1.0 if self._right_open else 0.0,
+            width=right_bar_width,
+        )
+
+        self.left_container = ft.Container(
+            content=self.left_inner,
+            width=left_bar_width if self._left_open else 0,
             bgcolor=left_bar_bgcolor,
             animate_size=anim,
-            opacity=1.0,
-            animate_opacity=fade_anim,
             clip_behavior=ft.ClipBehavior.HARD_EDGE,
             visible=self.left_bar_control is not None,
         )
 
         self.right_container = ft.Container(
-            content=self.right_bar_control,
-            width=right_bar_width if self.right_bar_control is not None else 0,
+            content=self.right_inner,
+            width=right_bar_width if self._right_open else 0,
             bgcolor=right_bar_bgcolor,
             animate_size=anim,
-            opacity=1.0,
-            animate_opacity=fade_anim,
             clip_behavior=ft.ClipBehavior.HARD_EDGE,
             visible=self.right_bar_control is not None,
         )
@@ -181,23 +195,27 @@ class ResponsiveLayout(ft.Container):
     # --- Métodos públicos ---
 
     def toggle_left_sidebar(self) -> None:
-        """Alterna la barra lateral izquierda con animación de ancho."""
+        """Alterna la barra lateral izquierda con animación de deslizamiento y fade."""
         if not self.left_bar_control or not self.left_bar_collapsible:
             return
         self._left_open = not self._left_open
         self.left_container.width = self._left_bar_width if self._left_open else 0
-        if self._fade_sidebars:
-            self.left_container.opacity = 1.0 if self._left_open else 0.0
+        self.left_inner.offset = (
+            ft.Offset(0, 0) if self._left_open else ft.Offset(-0.2, 0)
+        )
+        self.left_inner.opacity = 1.0 if self._left_open else 0.0
         self.update()
 
     def toggle_right_sidebar(self) -> None:
-        """Alterna la barra lateral derecha con animación de ancho."""
+        """Alterna la barra lateral derecha con animación de deslizamiento y fade."""
         if not self.right_bar_control or not self.right_bar_collapsible:
             return
         self._right_open = not self._right_open
         self.right_container.width = self._right_bar_width if self._right_open else 0
-        if self._fade_sidebars:
-            self.right_container.opacity = 1.0 if self._right_open else 0.0
+        self.right_inner.offset = (
+            ft.Offset(0, 0) if self._right_open else ft.Offset(0.2, 0)
+        )
+        self.right_inner.opacity = 1.0 if self._right_open else 0.0
         self.update()
 
     def on_resize(self, width: int) -> None:
@@ -222,8 +240,10 @@ class ResponsiveLayout(ft.Container):
             ) or (self._is_tablet and self.collapse_sidebars_on_tablet)
             self._left_open = not should_collapse
             self.left_container.width = self._left_bar_width if self._left_open else 0
-            if self._fade_sidebars:
-                self.left_container.opacity = 1.0 if self._left_open else 0.0
+            self.left_inner.offset = (
+                ft.Offset(0, 0) if self._left_open else ft.Offset(-0.2, 0)
+            )
+            self.left_inner.opacity = 1.0 if self._left_open else 0.0
 
         if self.right_bar_control:
             should_collapse = (
@@ -233,8 +253,10 @@ class ResponsiveLayout(ft.Container):
             self.right_container.width = (
                 self._right_bar_width if self._right_open else 0
             )
-            if self._fade_sidebars:
-                self.right_container.opacity = 1.0 if self._right_open else 0.0
+            self.right_inner.offset = (
+                ft.Offset(0, 0) if self._right_open else ft.Offset(0.2, 0)
+            )
+            self.right_inner.opacity = 1.0 if self._right_open else 0.0
 
         self.update()
 

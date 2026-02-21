@@ -29,8 +29,8 @@ class TestTranslationManager(unittest.TestCase):
 
     def test_get_available_languages(self):
         langs = get_available_languages()
-        self.assertIn("en", langs)
-        self.assertIn("es", langs)
+        self.assertIn("English", langs)
+        self.assertIn("Español", langs)
         self.assertEqual(len(langs), 2)
 
 

@@ -27,6 +27,29 @@ class TranslationManager:
         self.available_languages: List[str] = []
         self._load_csv()
 
+    def awake(self, page=None) -> None:
+        """
+        Initialize user language preferences.
+        To use this in a Flet app, call it after initializing the page:
+
+        def main(page: ft.Page):
+            translator.awake(page)
+            # ... rest of the app
+        """
+        stored_language = page.client_storage.get("language")
+        if stored_language:
+            # Aseguramos que sea un código (por si se guardó el nombre completo)
+            from .languages import get_language_code
+
+            self.set_language(get_language_code(stored_language))
+        else:
+            default_language = page.locale
+            if default_language in self.available_languages:
+                self.set_language(default_language)
+            else:
+                self.set_language(self.default_lang)
+            page.client_storage.set("language", self.active_lang)
+
     def _load_csv(self) -> None:
         if not os.path.isfile(self.csv_path):
             return
@@ -50,8 +73,10 @@ class TranslationManager:
         self.active_lang = lang
 
     def get_available_languages(self) -> List[str]:
-        """Return a list of language codes available in the CSV."""
-        return self.available_languages
+        """Return a list of language names available in the CSV."""
+        from .languages import get_language_name
+
+        return [get_language_name(lang) for lang in self.available_languages]
 
     def translate(self, key: str) -> str:
         """Return the translation for key in the active language.
@@ -76,5 +101,10 @@ def set_language(lang: str) -> None:
 
 
 def get_available_languages() -> List[str]:
-    """Get all available language codes."""
+    """Get all available language names."""
     return translator.get_available_languages()
+
+
+def awake(page=None) -> None:
+    """Initialize language preferences."""
+    translator.awake(page)

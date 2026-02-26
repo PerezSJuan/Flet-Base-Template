@@ -1,7 +1,8 @@
 import flet as ft
 
 def filled_btn(text, icon=None, on_click=None, enabled=True):
-    """It creates a filled button with the specified text and click event handler and the main color of the theme"""
+    """It creates a filled button with the specified text and click 
+    event handler and the main color of the theme"""
     return ft.FilledButton(
         text=text,
         icon=icon,
@@ -13,7 +14,8 @@ def filled_btn(text, icon=None, on_click=None, enabled=True):
 
 
 def icon_filled_btn(icon, on_click=None, enabled=True):
-    """It creates a filled button with the specified icon and click event handler and the main color of the theme"""
+    """It creates a filled button with the specified icon and click 
+    event handler and the main color of the theme"""
     return ft.FilledIconButton(
         icon=icon,
         on_click=on_click,
@@ -23,7 +25,8 @@ def icon_filled_btn(icon, on_click=None, enabled=True):
     )
 
 def icon_btn (icon, on_click=None, enabled=True):
-    """It creates a empty button with the specified icon and click event handler and the main color of the theme"""
+    """It creates a empty button with the specified icon and click 
+    event handler and the main color of the theme"""
     return ft.IconButton(
         icon=icon,
         on_click=on_click,
@@ -32,7 +35,9 @@ def icon_btn (icon, on_click=None, enabled=True):
     )
 
 def text_btn(text, icon=None, on_click=None, enabled=True):
-    """It creates a empty (no bg) button with the specified text and the option of an icon and click event handler and the main color of the theme"""
+    """It creates a empty (no bg) button with the specified text 
+    and the option of an icon and click event handler and the main
+    color of the theme"""
     return ft.TextButton(
         text=text,
         icon=icon,
@@ -42,7 +47,9 @@ def text_btn(text, icon=None, on_click=None, enabled=True):
     )
 
 def btn(text, icon=None, on_click=None, enabled=True):
-    """It creates a empty button with the specified text and the option of an icon and click event handler and the main color of the theme"""
+    """It creates a empty button with the specified text and the
+      option of an icon and click event handler and the main color 
+      of the theme"""
     return ft.FilledButton(
         text=text,
         icon=icon,

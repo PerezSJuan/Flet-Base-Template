@@ -1,6 +1,7 @@
 import flet as ft
 
-import themes
+import translations
+
 
 def alert_modal(title, content, responses=None, on_dismiss=None):
     """It creates an alert modal. The title and content are required, 
@@ -9,8 +10,10 @@ def alert_modal(title, content, responses=None, on_dismiss=None):
     when the dismiss button is clicked. See this function to learn how to format responses"""
     if responses is None:
         responses = ft.TextButton(
-            "Dismiss",
+            text=translations.t("dismiss"),
             on_click=lambda e: on_dismiss(e) if on_dismiss else None,
+            text_color=ft.Colors.prymary
+            
         )
     return ft.AlertDialog(
         title=ft.Text(title),

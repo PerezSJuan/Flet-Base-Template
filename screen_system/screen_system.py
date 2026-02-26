@@ -79,7 +79,7 @@ class ScreenRouter:
 
         if self.animate_transitions:
             self.content_container.animate_opacity = ft.Animation(
-                duration=self.transition_duration_ms, curve=ft.AnimationCurve.EASE_IN
+                duration=self.transition_duration_ms, curve="easeIn"
             )
             self.content_container.opacity = 1.0
 

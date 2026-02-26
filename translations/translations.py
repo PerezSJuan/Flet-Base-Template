@@ -36,7 +36,7 @@ class TranslationManager:
             translator.awake(page)
             # ... rest of the app
         """
-        stored_language = page.client_storage.get("language")
+        stored_language = page.shared_preferences.get("language")
         if stored_language:
             # Aseguramos que sea un código (por si se guardó el nombre completo)
             from .languages import get_language_code
@@ -48,7 +48,7 @@ class TranslationManager:
                 self.set_language(default_language)
             else:
                 self.set_language(self.default_lang)
-            page.client_storage.set("language", self.active_lang)
+            page.shared_preferences.set("language", self.active_lang)
 
     def _load_csv(self) -> None:
         if not os.path.isfile(self.csv_path):

@@ -1,91 +1,95 @@
-from typing import Dict
 import flet as ft
 
+# Esquema de colores enriquecido con propiedades adicionales
+LIGHT_COLOR_SCHEME = ft.ColorScheme(
+    primary="#007BFF",  # Azul principal
+    on_primary="#FFFFFF",  # Texto blanco sobre azul
+    surface="#F8F9FA",  # Fondo claro
+    on_surface="#212529",  # Texto oscuro sobre fondo claro
+    text_color="#212529",  # Color de texto principal
+    background="#FFFFFF",  # Fondo general
+    on_background="#000000",  # Texto sobre fondo general
+    filled_button_text_color="#FFFFFF",  # Color del texto en botones llenos
+    red_color="#DC3545",  # Color para acciones de eliminación o advertencia
+)
 
-LIGHT_THEME: Dict[str, str] = {
-    "primary": "#1976D2",
-    "on_primary": "#FFFFFF",
-    "primary_container": "#BBDEFB",
-    "on_primary_container": "#0D47A1",
-    "secondary": "#9C27B0",
-    "on_secondary": "#FFFFFF",
-    "secondary_container": "#E1BEE7",
-    "on_secondary_container": "#4A148C",
-    "tertiary": "#FF5722",
-    "on_tertiary": "#FFFFFF",
-    "background": "#FFFFFF",
-    "on_background": "#000000",
-    "surface": "#FFFFFF",
-    "on_surface": "#000000",
-    "surface_variant": "#F5F5F5",
-    "error": "#B00020",
-    "on_error": "#FFFFFF",
-    "success": "#2E7D32",
-    "info": "#0288D1",
-    "warning": "#F9A825",
-    "outline": "#BDBDBD",
-    "shadow": "rgba(0,0,0,0.2)",
-    "scrim": "rgba(0,0,0,0.6)",
-    "inverse_surface": "#121212",
-    "inverse_on_surface": "#FFFFFF",
-}
+DARK_COLOR_SCHEME = ft.ColorScheme(
+    primary="#6C757D",  # Gris principal
+    on_primary="#FFFFFF",  # Texto blanco sobre gris
+    surface="#343A40",  # Fondo oscuro
+    on_surface="#E9ECEF",  # Texto claro sobre fondo oscuro
+    text_color="#E9ECEF",  # Color de texto principal
+    background="#1E1E1E",  # Fondo general
+    on_background="#FFFFFF",  # Texto sobre fondo general
+    filled_button_text_color="#000000",  # Color del texto en botones llenos
+    red_color="#DC3545",  # Color para acciones de eliminación o advertencia
+)
 
+# Temas enriquecidos
+LIGHT_THEME = ft.Theme(color_scheme=LIGHT_COLOR_SCHEME, use_material3=True)
+DARK_THEME = ft.Theme(color_scheme=DARK_COLOR_SCHEME, use_material3=True)
 
-DARK_THEME: Dict[str, str] = {
-    "primary": "#90CAF9",
-    "on_primary": "#0D47A1",
-    "primary_container": "#1565C0",
-    "on_primary_container": "#E3F2FD",
-    "secondary": "#CE93D8",
-    "on_secondary": "#4A148C",
-    "secondary_container": "#6A1B9A",
-    "on_secondary_container": "#F3E5F5",
-    "tertiary": "#FFAB91",
-    "on_tertiary": "#000000",
-    "background": "#121212",
-    "on_background": "#FFFFFF",
-    "surface": "#1E1E1E",
-    "on_surface": "#FFFFFF",
-    "surface_variant": "#2C2C2C",
-    "error": "#CF6679",
-    "on_error": "#000000",
-    "success": "#81C784",
-    "info": "#64B5F6",
-    "warning": "#FFD54F",
-    "outline": "#373737",
-    "shadow": "rgba(0,0,0,0.7)",
-    "scrim": "rgba(0,0,0,0.8)",
-    "inverse_surface": "#FFFFFF",
-    "inverse_on_surface": "#000000",
-}
+async def awake_theme(page: ft.Page) -> str:
+    """
+    Inicializa el tema de la página basándose en el almacenamiento local o el sistema.
+    """
+    # Obtener el tema guardado
+    stored_theme = await page.shared_preferences.get("theme")
 
-
-def awake_theme(page: ft.page) -> str:
-    stored_theme = page.client_storage.get("theme")
     if not stored_theme:
-        if page.ThemeMode.SYSTEM == ft.ThemeMode.DARK_THEME:
-            stored_theme = "dark"
-            page.client_storage.set("theme", "dark")
-            page.theme_mode = ft.ThemeMode.DARK_THEME
-        elif page.ThemeMode.SYSTEM == ft.ThemeMode.LIGHT_THEME:
-            stored_theme = "light"
-            page.client_storage.set("theme", "light")
-            page.theme_mode = ft.ThemeMode.LIGHT_THEME
-    if stored_theme:
-        if stored_theme == "dark":
-            page.theme_mode = ft.ThemeMode.DARK_THEME
-        elif stored_theme == "light":
-            page.theme_mode = ft.ThemeMode.LIGHT_THEME
+        # Si no hay nada guardado, usamos "light" por defecto y lo guardamos
+        stored_theme = "light"
+        await page.shared_preferences.set("theme", "light")
+
+    # Aplicar el tema a la página
+    if stored_theme == "dark":
+        page.theme_mode = ft.ThemeMode.DARK
+    else:
+        page.theme_mode = ft.ThemeMode.LIGHT
+
+    # Asignar los objetos de tema
+    page.theme = LIGHT_THEME
+    page.dark_theme = DARK_THEME
+
+    page.update()
     return stored_theme
 
 
-theme = awake_theme()
-
-
-def get_theme_colors(mode: str = theme) -> Dict[str, str]:
-    if mode.lower() == "light":
-        return LIGHT_THEME
-    elif mode.lower() == "dark":
-        return DARK_THEME
+async def toggle_theme(page: ft.Page):
+    """
+    Cambia entre tema claro y oscuro y persiste la elección.
+    """
+    if page.theme_mode == ft.ThemeMode.DARK:
+        page.theme_mode = ft.ThemeMode.LIGHT
+        await page.shared_preferences.set("theme", "light")
     else:
-        print("Modo de tema desconocido: usar 'light' o 'dark'.")
+        page.theme_mode = ft.ThemeMode.DARK
+        await page.shared_preferences.set("theme", "dark")
+
+    page.update()
+
+
+def get_theme_colors(page: ft.Page) -> ft.ColorScheme:
+    """
+    Retorna el esquema de colores activo actualmente en la página.
+    """
+    if page.theme_mode == ft.ThemeMode.DARK:
+        return DARK_COLOR_SCHEME
+    return LIGHT_COLOR_SCHEME
+
+def apply_theme(page: ft.Page, theme_mode: str = "light"):
+    """
+    Aplica el tema especificado a la página.
+
+    Args:
+        page (ft.Page): Página de Flet.
+        theme_mode (str): Modo de tema, "light" o "dark".
+    """
+    if theme_mode == "dark":
+        page.theme_mode = ft.ThemeMode.DARK
+        page.theme = DARK_THEME
+    else:
+        page.theme_mode = ft.ThemeMode.LIGHT
+        page.theme = LIGHT_THEME
+
+    page.update()
